@@ -16,8 +16,7 @@ function Content({ messages, loading }: Props) {
   }, [messages]);
 
   const renderInfo = (message: Message) => {
-    console.log(message);
-    if ((!message.sources || message.sources.length === 0) && !message.tool) {
+    if (!message.tool) {
       return null;
     }
 

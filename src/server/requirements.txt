@@ -3,3 +3,9 @@ uvicorn[standard]
 langchain
 openai
 httpx
+python-dotenv
+jupyter
+tiktoken
+pgvector
+psycopg==3.1.8
+slack_sdk

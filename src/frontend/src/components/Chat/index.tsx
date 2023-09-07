@@ -1,8 +1,9 @@
 import { useState } from "react";
 import Header from "./Header";
 import Content from "./Content";
-import { ConversationResponse, Message } from "../../types";
+import { Message } from "../../types";
 import InputBox from "./InputBox";
+import { sendChat } from "../../api";
 
 const aiName = "ChatAI";
 
@@ -22,40 +23,22 @@ function Chat({ username }: Props) {
   ]);
 
   const sendANewMessage = async (message: Message) => {
-    setChatMessages((prevMessages) => [...prevMessages, message]);
-
     setLoading(true);
-    let answer: ConversationResponse;
-    try {
-      const data = JSON.stringify({
-        history: chatMessages.map((c) => ({
-          text: c.text,
-          isChatOwner: c.isChatOwner,
-        })),
-        question: message,
-      });
 
-      const response = await fetch("/api/conversation", {
-        method: "POST",
-        body: data,
-      });
-      answer = await response.json();
-    } catch (e: unknown) {
-      answer = { response: `Uh oh! An error occurred. Please try again` };
-    } finally {
-      setChatMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          text: answer.response,
-          sources: answer.sources,
-          tool: answer.tool,
-          sentBy: aiName,
-          sentAt: new Date(),
-          isChatOwner: false,
-        },
-      ]);
-      setLoading(false);
-    }
+    const answer = await sendChat(chatMessages, message);
+    setChatMessages((prevMessages) => [
+      ...prevMessages,
+      message,
+      {
+        text: answer.response,
+        tool: answer.tool,
+        sentBy: aiName,
+        sentAt: new Date(),
+        isChatOwner: false,
+      },
+    ]);
+
+    setLoading(false);
   };
 
   return (

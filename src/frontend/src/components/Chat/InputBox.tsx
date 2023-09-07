@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Message } from "../../types";
-import { DebouncedInput } from "../DebouncedElements";
+import { Input } from "../Input";
 
 type Props = {
   sendMessage: (message: Message) => void;
@@ -31,9 +31,8 @@ function InputBox({ sendMessage }: Props) {
   return (
     <div className="px-6 py-3 bg-white w-100 overflow-hidden rounded-bl-xl rounded-br-xla">
       <div className="flex flex-row items-center space-x-5">
-        <DebouncedInput
+        <Input
           value={message ?? ""}
-          debounce={100}
           onChange={(value) => setMessage(String(value))}
           onKeyDown={onKeyDown}
         />

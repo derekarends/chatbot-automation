@@ -1,6 +1,3 @@
-import os
-from typing import List, Tuple
-from dotenv import load_dotenv
 from langchain.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -8,25 +5,22 @@ from langchain.vectorstores.pgvector import PGVector, DistanceStrategy
 from langchain.docstore.document import Document
 from langchain.utils import get_from_dict_or_env
 from langchain.vectorstores.base import VectorStoreRetriever
-from pydantic import BaseModel, root_validator
+from pydantic.v1 import BaseModel, root_validator
 
 
 class PgVector(BaseModel):
-    _retriever: VectorStoreRetriever
-    _embeddings: OpenAIEmbeddings
-    _connection_string: str
+    connection_string: str
+    embeddings: OpenAIEmbeddings
 
-    collection_name: str
-
-    @root_validator()
-    def validate_environment(cls, values: dict) -> dict:
+    @root_validator(pre=True)
+    def validate_env(cls, data: dict) -> dict:
         driver = get_from_dict_or_env(
-            values, "db_driver", "DB_DRIVER", "psycopg")
-        host = get_from_dict_or_env(values, "db_host", "DB_HOST")
-        port = get_from_dict_or_env(values, "db_port", "DB_PORT")
-        database = get_from_dict_or_env(values, "db_database", "DB_DATABASE")
-        user = get_from_dict_or_env(values, "db_user", "DB_USER")
-        password = get_from_dict_or_env(values, "db_password", "DB_PASSWORD")
+            data, "db_driver", "DB_DRIVER", "psycopg")
+        host = get_from_dict_or_env(data, "db_host", "DB_HOST")
+        port = get_from_dict_or_env(data, "db_port", "DB_PORT")
+        database = get_from_dict_or_env(data, "db_database", "DB_DATABASE")
+        user = get_from_dict_or_env(data, "db_user", "DB_USER")
+        password = get_from_dict_or_env(data, "db_password", "DB_PASSWORD")
 
         connection_string = PGVector.connection_string_from_db_params(
             driver=driver,
@@ -36,22 +30,12 @@ class PgVector(BaseModel):
             user=user,
             password=password
         )
-        values["_connection_string"] = connection_string
+        data["connection_string"] = connection_string
 
-        embeddings = OpenAIEmbeddings()
-        values["_embeddings"] = embeddings
+        openai_embeddings = OpenAIEmbeddings()
+        data["embeddings"] = openai_embeddings
 
-        store = PGVector(
-            connection_string=connection_string,
-            embedding_function=embeddings,
-            collection_name='state_of_the_union',
-            distance_strategy=DistanceStrategy.COSINE
-        )
-
-        retriever = store.as_retriever(search_kwargs={"k": 1})
-        values["_retriever"] = retriever
-
-        return values
+        return data
 
     def load(self, path: str, collection_name: str) -> None:
         """ Loads a text file and stores it in the database. """
@@ -63,21 +47,26 @@ class PgVector(BaseModel):
         docs = text_splitter.split_documents(documents)
 
         PGVector.from_documents(
-            embedding=self._embeddings,
+            connection_string=self.connection_string,
+            embedding=self.embeddings,
             documents=docs,
             collection_name=collection_name,
-            connection_string=self._connection_string,
         )
 
-    def search(self, query: str) -> List[Document]:
+    def search(self, query: str, collection_name: str) -> list[str]:
         """ Searches the database for the given query. """
 
-        docs_with_score = self._retriever.get_relevant_documents(query=query)
-        for doc, score in docs_with_score:
-            print("-" * 80)
-            print("Score: ", score)
-            print(doc.page_content)
-            print(doc.metadata)
-            print("-" * 80)
+        store = PGVector(
+            connection_string=self.connection_string,
+            embedding_function=self.embeddings,
+            collection_name=collection_name,
+            distance_strategy=DistanceStrategy.COSINE
+        )
 
-        return docs_with_score
+        retriever = store.as_retriever(
+            search_kwargs={"k": 3, "score_threshold": "0.8"})
+        docs = retriever.get_relevant_documents(query=query)
+        if docs is None or len(docs) == 0:
+            return []
+
+        return [doc.page_content for doc in docs]

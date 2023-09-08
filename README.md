@@ -8,6 +8,12 @@ This repo is to demonstrate how to use Langchain with custom tools on a chatbot 
 - Create a virtual environment
   - Run `python3 -m venv .venv`
 
+### Setting up PGVector
+
+- Run `docker-compose up -d` in root directory
+- Connect to `langchain` database with username and password from `docker-compose.yml`
+- Run `create extension if not exists vector;` to enable vector extension
+
 ### To run server
 
 Navigate to `src/server`

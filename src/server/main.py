@@ -1,3 +1,6 @@
+import os
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,8 +13,15 @@ from schema import (
     BaseMessage,
     UserMessage,
     AssistantMessage,
-    SystemMessage
+    SystemMessage,
+    LoadRequest
 )
+
+from db import PgVector
+
+
+load_dotenv()
+os.environ["OPENAI_API_KEY"] = os.getenv('OPENAI_API_KEY')
 
 app = FastAPI()
 
@@ -24,13 +34,16 @@ app.add_middleware(
 )
 
 
-@app.post("/api/conversation")
-def conversation(request: ConversationRequest):
-    search_results: list[SearchResult] = search(request.message.text)
+@app.post("/api/load", status_code=200)
+def load(request: LoadRequest):
+    db = PgVector()
+    db.load(path=request.path, collection_name=request.collection_name)
 
-    context = []
-    for search_result in search_results:
-        context.append(f"{search_result.title}-{search_result.content}")
+
+@app.post("/api/conversation", response_model=ConversationResponse, status_code=200)
+def conversation(request: ConversationRequest):
+    search_results: list[SearchResult] = search(
+        request.message.text, request.collection_name)
 
     conversation: list[BaseMessage] = [
         SystemMessage(content="You are a helpful assistant.")
@@ -38,28 +51,28 @@ def conversation(request: ConversationRequest):
 
     for prev_message in request.history:
         prev_text = prev_message.text or ""
-        if prev_message.isChatOwner:
+        if prev_message.is_chat_owner:
             conversation.append(UserMessage(content=prev_text))
         else:
             conversation.append(AssistantMessage(content=prev_text))
 
     conversation.append(UserMessage(
-        content=create_prompt(request.message, context)))
+        content=create_prompt(request.message, search_results)))
 
     print(conversation)
     return ConversationResponse(response=request.message.text, tool="test")
 
 
-def search(message: str) -> list[SearchResult]:
-    print(f'searching for {message}')
-    return []
+def search(message: str, collection_name: str) -> list[str]:
+    db = PgVector()
+    return db.search(message, collection_name)
 
 
 def create_prompt(message: str, context: list[str]) -> str:
     template = """
       Answer the question, first consider the information after --- or the chat history.
-      
-      QUESTION: 
+
+      QUESTION:
       {message}
 
       ---

@@ -4,19 +4,6 @@ const endpoint = import.meta.env.VITE_API_URL || ''
 
 async function sendChat(chatMessages: Message[], message: Message): Promise<ConversationResponse> {
   try {
-    // {
-    //   "history": [
-    //     {
-    //       "text": "string",
-    //       "isChatOwner": true
-    //     }
-    //   ],
-    //   "message": {
-    //     "text": "string",
-    //     "isChatOwner": true
-    //   }
-    // }
-
     const data = JSON.stringify({
       history: chatMessages.map((c) => ({
         text: c.text,
@@ -25,6 +12,7 @@ async function sendChat(chatMessages: Message[], message: Message): Promise<Conv
       message: {
         text: message.text,
         isChatOwner: message.isChatOwner,
+        collectionName: 'space_turtles'
       },
     });
 

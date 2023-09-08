@@ -7,5 +7,5 @@ python-dotenv
 jupyter
 tiktoken
 pgvector
-psycopg==3.1.8
+psycopg[binary]
 slack_sdk

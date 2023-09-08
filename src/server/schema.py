@@ -1,13 +1,20 @@
 from abc import abstractmethod
-from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+
+class LoadRequest(BaseModel):
+    """ Load Request object. """
+
+    path: str
+    collection_name: str = Field(alias='collectionName')
 
 
 class ConversationMessage(BaseModel):
     """ Conversation Request object. """
+
     text: str | None
-    isChatOwner: bool
+    is_chat_owner: bool = Field(alias='isChatOwner')
 
 
 class ConversationRequest(BaseModel):
@@ -15,6 +22,7 @@ class ConversationRequest(BaseModel):
 
     history: list[ConversationMessage]
     message: ConversationMessage
+    collection_name: str | None = Field(default=None, alias='collectionName')
 
 
 class ConversationResponse(BaseModel):
@@ -28,7 +36,7 @@ class BaseMessage(BaseModel):
     """Open AI Message object."""
 
     content: str
-    name: Optional[str] = None
+    name: str | None = None
 
     @property
     @abstractmethod

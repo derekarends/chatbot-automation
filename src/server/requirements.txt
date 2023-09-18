@@ -9,3 +9,5 @@ tiktoken
 pgvector
 psycopg[binary]
 slack_sdk
+scipy
+google-search-results

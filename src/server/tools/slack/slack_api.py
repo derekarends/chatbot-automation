@@ -1,7 +1,5 @@
 """ Util that calls Slack. """
-from typing import Optional
-
-from pydantic import BaseModel, Extra, root_validator
+from pydantic.v1 import BaseModel, Extra, root_validator
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
@@ -34,11 +32,12 @@ class SlackApiWrapper(BaseModel):
     class Config:
         """ Configuration for this pydantic object. """
         extra = Extra.forbid
+        arbitrary_types_allowed = True
 
-    def list(self) -> list[dict]:
+    def list_operations(self) -> list[dict]:
         return self.operations
 
-    @root_validator()
+    @root_validator(pre=True)
     def validate_environment(cls, values: dict) -> dict:
         """ Validate that api key and python package exists in environment. """
         bot_token = get_from_dict_or_env(
@@ -49,7 +48,7 @@ class SlackApiWrapper(BaseModel):
 
         return values
 
-    def run(self, mode: str, text: Optional[str]) -> str:
+    def run(self, mode: str, text: str | None) -> str:
         """ Based on the mode from the caller, run the appropriate function. """
         if mode == "channels_read":
             return self.channels_read()

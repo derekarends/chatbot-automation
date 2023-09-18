@@ -17,8 +17,6 @@ from schema import (
     LoadRequest
 )
 
-from db import PgVector
-
 
 load_dotenv()
 os.environ["OPENAI_API_KEY"] = os.getenv('OPENAI_API_KEY')
@@ -32,12 +30,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.post("/api/load", status_code=200)
-def load(request: LoadRequest):
-    db = PgVector()
-    db.load(path=request.path, collection_name=request.collection_name)
 
 
 @app.post("/api/conversation", response_model=ConversationResponse, status_code=200)
@@ -64,8 +56,7 @@ def conversation(request: ConversationRequest):
 
 
 def search(message: str, collection_name: str) -> list[str]:
-    db = PgVector()
-    return db.search(message, collection_name)
+    return ["This is a search result"]
 
 
 def create_prompt(message: str, context: list[str]) -> str:

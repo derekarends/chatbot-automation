@@ -1,25 +1,25 @@
-"""Slack Toolkit."""
+"""Doc Toolkit."""
 
 from langchain.agents.agent_toolkits.base import BaseToolkit
 from langchain.tools import BaseTool
-from slack_tool import SlackTool
-from slack_api import SlackApiWrapper
+from doc_tool import DocTool
+from doc_api import DocApiWrapper
 
 
-class SlackToolKit(BaseToolkit):
-    """Slack Toolkit."""
+class DocToolKit(BaseToolkit):
+    """Doc Toolkit."""
 
     tools: list[BaseTool] = []
 
     @classmethod
-    def from_slack_api_wrapper(cls, slack_api_wrapper: SlackApiWrapper) -> "SlackToolKit":
-        operations = slack_api_wrapper.list_operations()
+    def from_doc_api_wrapper(cls, api_wrapper: DocApiWrapper) -> "DocToolKit":
+        operations = api_wrapper.list_operations()
         tools = [
-            SlackTool(
+            DocTool(
                 name=operation["name"],
                 description=operation["description"],
                 mode=operation["mode"],
-                api_wrapper=slack_api_wrapper,
+                api_wrapper=api_wrapper,
             )
             for operation in operations
         ]

@@ -28,3 +28,10 @@ Nagivate to `src/frontend`
 - Run `npm install`
 - Run `npm run dev`
 - Navigate to `http://localhost:5173`
+
+### To allow email tool to work
+
+- Must enabled Google API for Gmail
+- Create OAuth 2.0 Client ID
+- Give scope to read and send emails
+- Download credentials.json

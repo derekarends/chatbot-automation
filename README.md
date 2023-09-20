@@ -18,6 +18,7 @@ This repo is to demonstrate how to use Langchain with custom tools on a chatbot 
 
 Navigate to `src/server`
 
+- Rename `.env.example` to `.env` and replace variables with your own
 - Run `pip install -r requirements.txt`
 - Run `uvicorn main:app --reload`
 
@@ -35,3 +36,4 @@ Nagivate to `src/frontend`
 - Create OAuth 2.0 Client ID
 - Give scope to read and send emails
 - Download credentials.json
+- Copy json data into `CREDENTIALS` variable in `.env` file

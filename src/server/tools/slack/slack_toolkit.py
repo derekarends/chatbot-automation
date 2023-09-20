@@ -2,8 +2,8 @@
 
 from langchain.agents.agent_toolkits.base import BaseToolkit
 from langchain.tools import BaseTool
-from slack_tool import SlackTool
-from slack_api import SlackApiWrapper
+from .slack_tool import SlackTool
+from .slack_api import SlackApiWrapper
 
 
 class SlackToolKit(BaseToolkit):

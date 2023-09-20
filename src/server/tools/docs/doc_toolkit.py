@@ -2,8 +2,8 @@
 
 from langchain.agents.agent_toolkits.base import BaseToolkit
 from langchain.tools import BaseTool
-from doc_tool import DocTool
-from doc_api import DocApiWrapper
+from .doc_tool import DocTool
+from .doc_api import DocApiWrapper
 
 
 class DocToolKit(BaseToolkit):
@@ -12,7 +12,7 @@ class DocToolKit(BaseToolkit):
     tools: list[BaseTool] = []
 
     @classmethod
-    def from_doc_api_wrapper(cls, api_wrapper: DocApiWrapper) -> "DocToolKit":
+    def from_api_wrapper(cls, api_wrapper: DocApiWrapper) -> "DocToolKit":
         operations = api_wrapper.list_operations()
         tools = [
             DocTool(

@@ -1,7 +1,7 @@
 from pydantic import Field
 
 from langchain.tools.base import BaseTool
-from email_api import EmailApiWrapper
+from .email_api import EmailApiWrapper
 
 
 class EmailTool(BaseTool):

@@ -9,7 +9,7 @@ To use this tool, you must first set as environment variables:
 from pydantic import Field
 
 from langchain.tools.base import BaseTool
-from slack_api import SlackApiWrapper
+from .slack_api import SlackApiWrapper
 
 
 class SlackTool(BaseTool):

@@ -5,7 +5,7 @@ from langchain.vectorstores.pgvector import PGVector, DistanceStrategy
 from langchain.utils import get_from_dict_or_env
 from pydantic.v1 import BaseModel, Extra, root_validator
 
-from doc_prompts import (
+from .doc_prompts import (
     Modes,
     SEARCH
 )

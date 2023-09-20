@@ -8,8 +8,9 @@ from pydantic.v1 import BaseModel, Extra, root_validator
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+from langchain.utils import get_from_dict_or_env
 
-from email_prompts import (
+from .email_prompts import (
     Modes,
     READ_EMAIL_FROM,
     SEND_EMAIL,
@@ -19,6 +20,7 @@ from email_prompts import (
 class EmailApiWrapper(BaseModel):
     """ Wrapper for reading and sending emails. """
     SCOPES = ['https://mail.google.com/']
+    credentials: str = None
 
     operations: list[dict] = [
         {
@@ -44,6 +46,9 @@ class EmailApiWrapper(BaseModel):
     @root_validator(pre=True)
     def validate_env(cls, data: dict) -> dict:
         """ Validate the environment variables. """
+
+        creds = get_from_dict_or_env(data, "credentials", "CREDENTIALS")
+        data["credentials"] = creds
 
         return data
 
@@ -133,8 +138,8 @@ class EmailApiWrapper(BaseModel):
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
             else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    'credentials.json', self.SCOPES)
+                flow = InstalledAppFlow.from_client_config(
+                    json.loads(self.credentials), self.SCOPES)
                 creds = flow.run_local_server(port=0)
 
             # Save the access token in token.pickle file for the next run

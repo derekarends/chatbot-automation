@@ -3,7 +3,7 @@ from pydantic.v1 import BaseModel, Extra, root_validator
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from slack_prompts import (
+from .slack_prompts import (
     SLACK_WRITE_MESSAGE_TO_CHANNEL,
     SLACK_READ_CHANNELS,
 )

@@ -6,7 +6,7 @@ and operate on a Doc instance.
 from pydantic import Field
 
 from langchain.tools.base import BaseTool
-from doc_api import DocApiWrapper
+from .doc_api import DocApiWrapper
 
 
 class DocTool(BaseTool):

@@ -1,7 +1,7 @@
 from langchain.agents.agent_toolkits.base import BaseToolkit
 from langchain.tools import BaseTool
-from email_tool import EmailTool
-from email_api import EmailApiWrapper
+from .email_tool import EmailTool
+from .email_api import EmailApiWrapper
 
 
 class EmailToolKit(BaseToolkit):

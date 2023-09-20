@@ -1,16 +1,27 @@
 class Modes:
-    READ_EMAIL_FROM = 'read_email_from'
+    SEARCH_EMAIL_FROM = 'search_email_from'
+    SEARCH_EMAIL_SUBJECT = 'search_email_subject'
     SEND_EMAIL = 'send_email'
 
 
-READ_EMAIL_FROM = """
-    This tool is useful when you need to read an email from an email address in an email inbox.
-    The input for this tool will be a dictionary specifying the fields of the email inbox, and will be passed into the `read_email_from` function.
-    For example, to read an email from an email inbox, you would pass in the following string:
-    {{ "from": "derekarends23@gmail.com" }}
+SEARCH_EMAIL_FROM = """
+    This tool is useful when you need to search for an email based on the from line.
+    The input for this tool will be a dictionary specifying the from address to search for, and will be passed into the `search_email_from` function.
+    For example, to search for an email from an email inbox, you would pass in the following string:
+    {{ "from": "derek@gmail.com" }}
 
     The output off this tool will be a dictionary, where each dictionary represents a message in the format of 
     {{ "subject": "a subject", "body": "a body" }}
+    """
+
+SEARCH_EMAIL_SUBJECT = """
+    This tool is useful when you need to search for an email based on subject line.
+    The input for this tool will be a dictionary specifying the subject to search for, and will be passed into the `search_email_subject` function.
+    For example, to read an email's subject line, you would pass in the following string:
+    {{ "subject": "Top gear" }}
+
+    The output off this tool will be a dictionary, where each dictionary represents a message in the format of 
+    {{ "from": "derek@gmail.com", "subject": "a subject", "body": "a body" }}
     """
 
 SEND_EMAIL = """

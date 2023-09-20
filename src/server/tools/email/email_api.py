@@ -12,8 +12,9 @@ from langchain.utils import get_from_dict_or_env
 
 from .email_prompts import (
     Modes,
-    READ_EMAIL_FROM,
+    SEARCH_EMAIL_FROM,
     SEND_EMAIL,
+    SEARCH_EMAIL_SUBJECT,
 )
 
 
@@ -24,14 +25,19 @@ class EmailApiWrapper(BaseModel):
 
     operations: list[dict] = [
         {
-            "mode": Modes.READ_EMAIL_FROM,
+            "mode": Modes.SEARCH_EMAIL_FROM,
             "name": "Read an email from an email address",
-            "description": READ_EMAIL_FROM,
+            "description": SEARCH_EMAIL_FROM,
         },
         {
             "mode": Modes.SEND_EMAIL,
             "name": "Send an email to an email address",
             "description": SEND_EMAIL,
+        },
+        {
+            "mode": Modes.SEARCH_EMAIL_SUBJECT,
+            "name": "Search for an email based on subject",
+            "description": SEARCH_EMAIL_SUBJECT,
         }
     ]
 
@@ -54,22 +60,33 @@ class EmailApiWrapper(BaseModel):
 
     def run(self, mode: str, text: str | None) -> str:
         """ Based on the mode from the caller, run the appropriate function. """
-        if mode == Modes.READ_EMAIL_FROM:
+        if mode == Modes.SEARCH_EMAIL_FROM:
             return self.read_email_from(text)
         elif mode == Modes.SEND_EMAIL:
             return self.send_email(text)
+        elif mode == Modes.SEARCH_EMAIL_SUBJECT:
+            return self.search_email_subject(text)
         else:
             raise ValueError(f"Got unexpected mode {mode}")
 
+    def search_email_subject(self, subject: str) -> list[dict]:
+        """ Search for emails with subject line. """
+        data = json.loads(subject)
+        return self.read_messages(f"subject:{data['subject']}")
+
     def read_email_from(self, from_address: str) -> list[dict]:
         """ Read an email from an email address. """
+        data = json.loads(from_address)
+        return self.read_messages(f"from:{data['from']}")
+
+    def read_messages(self, query: str) -> list[dict]:
+        """ Read messages from an email address. """
         try:
             service = self._build()
-            data = json.loads(from_address)
 
             # request a list of all the messages
             result = service.users().messages().list(
-                maxResults='100', userId='me', q=f"from:{data['from']}").execute()
+                maxResults='100', userId='me', q=query).execute()
             messages = result.get('messages')
 
             to_return: list[dict] = []

@@ -68,7 +68,7 @@ class DocApiWrapper(BaseModel):
     def load_docs(self, path: str) -> None:
         """ Loads a text file and stores it in the database. """
 
-        loader = TextLoader(path)
+        loader = TextLoader(path, encoding="utf-8")
         documents = loader.load()
 
         text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
